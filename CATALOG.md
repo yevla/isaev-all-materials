@@ -10,4 +10,7 @@
 | Other | `materials/5.other` | Pending | Прочее (требует детального разбора). |
 
 ## Centralized Archive
-*To be populated during the centralization process.*
+| Component | Path | Description |
+| :--- | :--- | :--- |
+| **Master Dashboard** | `dashboard/index.html` | Unified Single-Page Application (SPA) for browsing all materials. Features search, filtering, and graph visualization. **Self-contained** (runs offline). |
+| Data Builder | `scripts/build_dashboard.py` | Python script to aggregate data from LJ, FB, and YT into the dashboard. |

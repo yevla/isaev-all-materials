@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISAIEV ARCHIVE | N E X U S</title>
+
+    <!-- Fonts: Premium & Modern -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@200;400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- D3.js for Graph (CDN) -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        :root {
+            /* NEXUS Deep Space Palette */
+            --bg-deep: #050509;
+            --bg-panel: rgba(20, 20, 30, 0.4);
+            --bg-card: rgba(30, 30, 45, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            /* Indigo Neon */
+
+            --lj: #f59e0b;
+            /* Amber */
+            --fb: #3b82f6;
+            /* Blue */
+            --yt: #ef4444;
+            /* Red */
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--bg-deep);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
+            color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            /* No scroll on body, app is full screen */
+            display: flex;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--glass-border);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .brand {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Filters */
+        .section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .btn-filter {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .btn-filter:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        .btn-filter.active {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: rgba(99, 102, 241, 0.3);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn-filter .count {
+            font-size: 10px;
+            opacity: 0.5;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* --- MAIN AREA --- */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .top-bar {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(5, 5, 9, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Search */
+        .search-box {
+            position: relative;
+            width: 400px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            padding: 12px 40px 12px 20px;
+            border-radius: 12px;
+            color: #fff;
+            font-family: inherit;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px;
+            border-radius: 10px;
+        }
+
+        .btn-view {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .btn-view.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Content Pane */
+        .content {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pane {
+            position: absolute;
+            inset: 0;
+            overflow-y: auto;
+            padding: 30px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+        }
+
+        .pane.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Grid View */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            background: rgba(40, 40, 60, 0.8);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card[data-source="LJ"] {
+            border-top: 2px solid var(--lj);
+        }
+
+        .card[data-source="FB"] {
+            border-top: 2px solid var(--fb);
+        }
+
+        .card[data-source="YT"] {
+            border-top: 2px solid var(--yt);
+        }
+
+        .card-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
+            font-weight: 600;
+            line-height: 1.3;
+            color: #fff;
+        }
+
+        .card-preview {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #cbd5e1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: auto;
+        }
+
+        .chip {
+            font-size: 10px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            color: var(--text-muted);
+        }
+
+        /* --- MODAL --- */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: #111118;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 800px;
+            max-width: 90vw;
+            height: 85vh;
+            border-radius: 24px;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.7);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+
+        .overlay.open .modal {
+            transform: scale(1);
+        }
+
+        .m-header {
+            padding: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .m-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .m-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 32px;
+            line-height: 1.1;
+            margin: 0;
+        }
+
+        .m-body {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #d1d5db;
+        }
+
+        .m-body p {
+            margin-bottom: 20px;
+        }
+
+        .btn-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+
+        .btn-close:hover {
+            background: #fff;
+            color: #000;
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="dot" style="background:#fff; width:12px; height:12px;"></div>
+            Isaev Archive
+        </div>
+
+        <div class="section-title">Источники</div>
+        <div class="filter-group" id="f-source">
+            <!-- JS Injected -->
+        </div>
+
+        <div class="section-title">Категории</div>
+        <div class="filter-group" id="f-cats" style="max-height: 300px; overflow-y: auto;">
+            <!-- JS Injected -->
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+        <div class="top-bar">
+            <div class="search-box">
+                <input type="text" id="search" placeholder="Поиск по архиву..." oninput="app.filter()">
+            </div>
+
+            <div class="view-toggle">
+                <button class="btn-view active" onclick="app.switchView('grid')">Grid</button>
+                <button class="btn-view" onclick="app.switchView('graph')">Graph (Network)</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Grid View -->
+            <div id="view-grid" class="pane active">
+                <div class="grid" id="grid-container"></div>
+            </div>
+
+            <!-- Graph View -->
+            <div id="view-graph" class="pane" style="overflow:hidden;">
+                <div id="graph-viz" style="width:100%; height:100%;"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODAL -->
+    <div class="overlay" id="overlay" onclick="if(event.target===this) app.closeModal()">
+        <div class="modal">
+            <div class="m-header">
+                <div>
+                    <span class="m-badge" id="m-badge">SOURCE</span>
+                    <h2 class="m-title" id="m-title">Post Title</h2>
+                    <div style="margin-top:10px; color:#64748b; font-size:13px;" id="m-date">2023-01-01</div>
+                </div>
+                <button class="btn-close" onclick="app.closeModal()">✕</button>
+            </div>
+            <div class="m-body">
+                <div id="m-text">
+                    Content goes here...
+                </div>
+                <div style="margin-top:30px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1);">
+                    <div class="chips" id="m-tags"></div>
+                    <div style="margin-top:20px;">
+                        <a id="m-link" href="#" target="_blank"
+                            style="color:var(--accent); text-decoration:none;">Открыть оригинал →</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ERROR DISPLAY -->
+    <div id="error-toast"
+        style="position:fixed; bottom:20px; right:20px; background:#ef4444; color:#fff; padding:15px; border-radius:10px; z-index:9999; display:none; font-family:sans-serif; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+        <h4 style="margin:0 0 5px 0;">System Error</h4>
+        <div id="error-text" style="font-size:0.9rem;"></div>
+    </div>
+
+    <script>
+        // Global Error Handler
+        window.onerror = function (msg, url, line, col, error) {
+            const display = document.getElementById('error-toast');
+            const text = document.getElementById('error-text');
+            if (display && text) {
+                display.style.display = 'block';
+                text.textContent = msg;
+            }
+            console.error("Global Error:", msg, error);
+            return false;
+        };
+
+        /* DATA_HERE */
+
+        // Ensure ISAEV_DATA exists (auto-created if build script replaced it, this is just fail-safe check)
+        // If ISAEV_DATA was declared via const in DATA_HERE, this check passes without error.
+        // If DATA_HERE was NOT replaced, we define it here.
+        // We use window property to check existence safely without ReferenceError
+        if (!window.ISAEV_DATA && typeof ISAEV_DATA === 'undefined') {
+            window.ISAEV_DATA = [];
+            console.warn("ISAEV_DATA was not injected. Using empty array.");
+        }
+
+        const app = {
+            // If ISAEV_DATA is const, we can access it directly. 
+            // If it's window.ISAEV_DATA, we can also access it.
+            data: typeof ISAEV_DATA !== 'undefined' ? ISAEV_DATA : [],
+
+            filters: {
+                source: new Set(['LJ', 'FB', 'YT']),
+                cats: new Set(),
+                search: ''
+            },
+
+            init() {
+                try {
+                    console.log("App initializing...");
+
+                    if (!this.data || this.data.length === 0) {
+                        // Just warn, don't throw, maybe just empty
+                        console.warn("Data is empty.");
+                    } else {
+                        console.log(`Loaded ${this.data.length} items`);
+                    }
+
+                    this.renderFilters();
+                    this.filter(); // Initial render
+
+                    // Setup View Toggle
+                    document.getElementById('search').focus();
+
+                } catch (e) {
+                    console.error("Init failed:", e);
+                    document.getElementById('error-toast').style.display = 'block';
+                    document.getElementById('error-text').textContent = e.message;
+                }
+            },
+
+            renderFilters() {
+                // Sources
+                const sources = [
+                    { id: 'LJ', name: 'LiveJournal', color: 'var(--lj)' },
+                    { id: 'FB', name: 'Facebook', color: 'var(--fb)' },
+                    { id: 'YT', name: 'YouTube', color: 'var(--yt)' }
+                ];
+
+                const sCont = document.getElementById('f-source');
+                if (sCont) {
+                    sCont.innerHTML = sources.map(s => `
+                        <button class="btn-filter active" onclick="app.toggleSource('${s.id}', this)">
+                            <span style="display:flex; align-items:center; gap:10px;">
+                                <div class="dot" style="background:${s.color}"></div> ${s.name}
+                            </span>
+                            <span class="count">${this.data.filter(d => d.source === s.id).length}</span>
+                        </button>
+                    `).join('');
+                }
+
+                // Categories
+                const cats = {};
+                this.data.forEach(d => {
+                    (d.categories || []).forEach(c => cats[c] = (cats[c] || 0) + 1);
+                });
+
+                const cCont = document.getElementById('f-cats');
+                if (cCont) {
+                    cCont.innerHTML = Object.entries(cats)
+                        .sort((a, b) => b[1] - a[1]) // Sort by count
+                        .map(([name, count]) => `
+                            <button class="btn-filter" onclick="app.toggleCat('${name}', this)">
+                                <span>${name}</span>
+                                <span class="count">${count}</span>
+                            </button>
+                        `).join('');
+                }
+            },
+
+            toggleSource(id, btn) {
+                if (this.filters.source.has(id)) this.filters.source.delete(id);
+                else this.filters.source.add(id);
+                btn.classList.toggle('active');
+                this.filter();
+            },
+
+            toggleCat(name, btn) {
+                if (this.filters.cats.has(name)) this.filters.cats.delete(name);
+                else this.filters.cats.add(name);
+                btn.classList.toggle('active');
+                this.filter();
+            },
+
+            filter() {
+                const qInput = document.getElementById('search');
+                const q = qInput ? qInput.value.toLowerCase() : '';
+
+                const filtered = this.data.filter(d => {
+                    const hasSource = this.filters.source.has(d.source);
+                    const hasCat = this.filters.cats.size === 0 || (d.categories && d.categories.some(c => this.filters.cats.has(c)));
+                    const hasSearch = !q || (d.title && d.title.toLowerCase().includes(q)) || (d.content && d.content.toLowerCase().includes(q)) || (d.tags && d.tags.some(t => t.toLowerCase().includes(q)));
+                    return hasSource && hasCat && hasSearch;
+                });
+
+                this.renderGrid(filtered);
+
+                const graphPane = document.getElementById('view-graph');
+                if (graphPane && graphPane.classList.contains('active')) {
+                    this.renderGraph(filtered);
+                }
+            },
+
+            renderGrid(data) {
+                const container = document.getElementById('grid-container');
+                if (!container) return;
+
+                if (data.length === 0) {
+                    container.innerHTML = '<div style="color:var(--text-muted); grid-column:1/-1; text-align:center;">Ничего не найдено</div>';
+                    return;
+                }
+
+                container.innerHTML = data.map(d => {
+                    // Truncate
+                    const preview = (d.content || '').slice(0, 140) + '...';
+                    return `
+                        <div class="card" data-source="${d.source}" onclick="app.openModal('${d.id}')">
+                            <div class="card-header">
+                                <span>${d.source}</span>
+                                <span>${d.date || ''}</span>
+                            </div>
+                            <div class="card-title">${d.title}</div>
+                            <div class="card-preview">${preview}</div>
+                            <div class="chips">
+                                ${(d.tags || []).slice(0, 3).map(t => `<span class="chip">#${t}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            },
+
+            openModal(id) {
+                const d = this.data.find(x => x.id === id);
+                if (!d) return;
+
+                const badge = document.getElementById('m-badge');
+                if (badge) {
+                    badge.textContent = d.source;
+                    badge.style.color = '#fff'; // Reset
+                    badge.style.background = `var(--${d.source.toLowerCase()})`;
+                }
+
+                const dateEl = document.getElementById('m-date');
+                if (dateEl) dateEl.textContent = d.date;
+
+                const titleEl = document.getElementById('m-title');
+                if (titleEl) titleEl.textContent = d.title;
+
+                const textEl = document.getElementById('m-text');
+                if (textEl) textEl.textContent = d.content;
+
+                const linkEl = document.getElementById('m-link');
+                if (linkEl) linkEl.href = d.url || '#';
+
+                const tagsEl = document.getElementById('m-tags');
+                if (tagsEl) tagsEl.innerHTML = (d.tags || []).map(t => `<span class="chip">#${t}</span>`).join('');
+
+                const overlay = document.getElementById('overlay');
+                if (overlay) overlay.classList.add('open');
+            },
+
+            closeModal() {
+                const overlay = document.getElementById('overlay');
+                if (overlay) overlay.classList.remove('open');
+            },
+
+            switchView(view) {
+                document.querySelectorAll('.btn-view').forEach(b => b.classList.remove('active'));
+                const targetBtn = event.currentTarget || document.querySelector(`.btn-view[onclick*="'${view}'"]`);
+                if (targetBtn) targetBtn.classList.add('active');
+
+                document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+                const pane = document.getElementById(`view-${view}`);
+                if (pane) pane.classList.add('active');
+
+                if (view === 'graph') this.filter(); // Trigger graph render
+            },
+
+            // --- GRAPH LOGIC ---
+            renderGraph(data) {
+                const container = document.getElementById('graph-viz');
+                if (!container) return;
+
+                container.innerHTML = '';
+                const width = container.clientWidth;
+                const height = container.clientHeight;
+
+                // 1. Prepare Nodes: Tags (Hubs) + Posts (Leafs)
+                // Filter to top connected tags to avoid mess
+                const relevantTags = {};
+
+                // Use limited data for performance if huge
+                const subset = data.length > 500 ? data.slice(0, 500) : data;
+
+                const nodes = [];
+                const links = [];
+                const addedNodes = new Set();
+
+                // Pre-calc tag counts
+                subset.forEach(p => {
+                    (p.tags || []).forEach(t => {
+                        relevantTags[t] = (relevantTags[t] || 0) + 1;
+                    });
+                });
+
+                // Create Post Nodes
+                subset.forEach(p => {
+                    nodes.push({ id: p.id, type: 'post', source: p.source, r: 3, data: p });
+                    addedNodes.add(p.id);
+
+                    (p.tags || []).forEach(t => {
+                        if (relevantTags[t] > 0) { // Only if tag is relevant
+                            // Create tag node if not exists
+                            if (!addedNodes.has(t)) {
+                                nodes.push({
+                                    id: t,
+                                    type: 'tag',
+                                    r: Math.min(20, 5 + relevantTags[t] * 0.5),
+                                    count: relevantTags[t]
+                                });
+                                addedNodes.add(t);
+                            }
+                            links.push({ source: p.id, target: t, value: 1 });
+                        }
+                    });
+                });
+
+                // 2. D3 Setup check
+                if (typeof d3 === 'undefined') {
+                    container.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-muted);">Graph requires Internet (D3.js)</div>';
+                    return;
+                }
+
+                const svg = d3.select("#graph-viz").append("svg")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .call(d3.zoom().on("zoom", (e) => g.attr("transform", e.transform)));
+
+                const g = svg.append("g");
+
+                // Physics
+                const simulation = d3.forceSimulation(nodes)
+                    .force("link", d3.forceLink(links).id(d => d.id).distance(50))
+                    .force("charge", d3.forceManyBody().strength(d => d.type === 'tag' ? -150 : -30))
+                    .force("collide", d3.forceCollide(d => d.r + 4))
+                    .force("center", d3.forceCenter(width / 2, height / 2));
+
+                // Lines
+                const link = g.append("g")
+                    .attr("stroke", "rgba(255,255,255,0.05)")
+                    .selectAll("line")
+                    .data(links)
+                    .join("line");
+
+                // Nodes Group
+                const node = g.append("g")
+                    .selectAll("g")
+                    .data(nodes)
+                    .join("g")
+                    .call(d3.drag()
+                        .on("start", dragstarted)
+                        .on("drag", dragged)
+                        .on("end", dragended));
+
+                // Circles
+                node.append("circle")
+                    .attr("r", d => d.r)
+                    .attr("fill", d => {
+                        if (d.type === 'tag') return '#fff';
+                        return d.source === 'LJ' ? 'var(--lj)' : (d.source === 'FB' ? 'var(--fb)' : 'var(--yt)');
+                    })
+                    .attr("fill-opacity", d => d.type === 'tag' ? 0.1 : 0.8)
+                    .attr("stroke", d => d.type === 'tag' ? 'rgba(255,255,255,0.5)' : 'none')
+                    .attr("stroke-width", d => d.type === 'tag' ? 1 : 0);
+
+                // Labels (ONLY for Tags)
+                node.append("text")
+                    .text(d => d.type === 'tag' ? d.id : '')
+                    .attr("x", d => d.r + 5)
+                    .attr("y", 4)
+                    .attr("font-size", d => Math.max(10, d.r))
+                    .attr("fill", "#cbd5e1")
+                    .attr("pointer-events", "none")
+                    .style("text-shadow", "0 2px 4px rgba(0,0,0,0.8)");
+
+                // Interactions
+                node.on("click", (e, d) => {
+                    if (d.type === 'post') app.openModal(d.id);
+                    if (d.type === 'tag') {
+                        // Optional: filter by this tag
+                    }
+                });
+
+                node.append("title").text(d => d.type === 'post' ? d.data.title : d.id);
+
+                // Tick
+                simulation.on("tick", () => {
+                    link
+                        .attr("x1", d => d.source.x)
+                        .attr("y1", d => d.source.y)
+                        .attr("x2", d => d.target.x)
+                        .attr("y2", d => d.target.y);
+
+                    node.attr("transform", d => `translate(${d.x},${d.y})`);
+                });
+
+                function dragstarted(event, d) {
+                    if (!event.active) simulation.alphaTarget(0.3).restart();
+                    d.fx = d.x; d.fy = d.y;
+                }
+                function dragged(event, d) { d.fx = event.x; d.fy = event.y; }
+                function dragended(event, d) {
+                    if (!event.active) simulation.alphaTarget(0);
+                    d.fx = null; d.fy = null;
+                }
+            }
+        };
+
+        window.onload = () => app.init();
+    </script>
+</body>
+
+</html>

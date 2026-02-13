@@ -69,10 +69,12 @@ def generate_data():
             })
         print(f"Added {len(yt_df)} YT videos.")
 
-    # Save to JSON
-    with open(OUTPUT_DATA, 'w', encoding='utf-8') as f:
+    # Save to JS (to bypass CORS when opening locally)
+    with open('dashboard/data.js', 'w', encoding='utf-8') as f:
+        f.write("const MASTER_DATA = ")
         json.dump(master_data, f, ensure_ascii=False, indent=2)
-    print(f"Master data saved to {OUTPUT_DATA}")
+        f.write(";")
+    print(f"Master data saved to dashboard/data.js")
 
 if __name__ == "__main__":
     generate_data()
