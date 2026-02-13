@@ -1,0 +1,25 @@
+# Dependency Lock Files (High Density/Low Value)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build & Dependency Directories
+node_modules/
+venv/
+dist/
+build/
+vendor/
+
+# Internal Metadata
+.git/
+.idea/
+.vscode/
+
+# Token-Expensive Media & Logs
+*.log
+*.svg
+*.map
+*.png
+*.jpg
+*.jpeg
+*.gif

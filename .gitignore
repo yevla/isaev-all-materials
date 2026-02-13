@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+.gemini/
+.antigravity/
+.agent/
+brain/
+
+# Temporary analysis files
+scripts/temp_*.py
+materials/tag_comparison.txt
+materials/3.yt/classification_report.txt
+
+# Keep data but ignore specific large or temporary files if needed
+# materials/4.audiolecs/
+# materials/5.other/
