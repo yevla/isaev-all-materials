@@ -18,12 +18,17 @@
   - Architecture: **Single-File HTML** (JSON injected at build time) to avoid local CORS issues.
   - Visualization: **D3.js Force Graph** for tag connections.
   - UI: Glassmorphism / "NEXUS" Dark Theme.
+- [x] **External Integrations**:
+  - **NotebookLM**: Connected via MCP. Cleaned up and renamed notebooks (YouTube, All Materials, Live Lectures).
+  - **Google Drive**: Implemented `gdrive_tracker` skill. Authenticated and monitoring `Книга_впроцессник` folder.
 
 ## Architectural Notes
 - **Local Filesystem Constraints**: Browsers block `fetch('data.json')` for `file://` protocol due to CORS. 
   - *Solution*: Data is injected into `<script>` inside `index.html` by `scripts/build_dashboard.py`.
 - **Variable Declaration**: Avoid `const` for data injection variables if the script might be re-evaluated or if injection fails. Use `var` or `window.DATA` checking.
+- **MCP Integration**: Uses both `notebooklm` (for transcripts/analysis) and `google-drive-mcp` (for tracking drafting progress).
 - [ ] Process `4.audiolecs` and `5.other`.
+- [ ] Map all 36 YouTube transcripts to the Book Structure identified in Google Drive.
 
 ## Context & Constraints
 - Working with diverse material types (text, social media, audio).

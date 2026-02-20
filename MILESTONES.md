@@ -56,7 +56,21 @@
 - **Fix**: Removed `const` redeclaration in injected code. Changed to robust `window.ISAEV_DATA` check.
 - **Safety**: Added a Global Error Boundary. If the dashboard crashes, it now shows a red "System Error" toast instead of failing silently.
 
-## Current State (Ready)
-- **Total Items**: 396 (279 LJ + 82 FB + 35 YT).
-- **Interface**: `dashboard/index.html` (v2.1).
-- **Status**: Stable, Fast, Offline-capable.
+## Milestone 5: Book Drafting & Intelligent Research
+- [x] **NotebookLM Synchronization**
+    - Refined and organized 35+ notebooks into a logical structure:
+        - `Isaev: YouTube` (Video transcripts base).
+        - `Isaev: all materials` (Unified posts archive).
+        - `Isaev: live lectures` (Oral recordings).
+- [x] **Google Drive Integration**
+    - Established connection to `Книга_впроцессник` (Book-in-progress).
+    - Map of book structure (5 parts: Foundation, Scenarios, Roles, Psychosomatics, Healing).
+- [x] **Progress Tracking (New Skill)**
+    - Created `gdrive_tracker` skill to monitor Dmitry's edits, revision history, and word counts.
+    - Automated the "Snapshot" process to catch every new paragraph.
+
+## Current State (Active Implementation)
+- **Total Materials**: 396 items + 36 full YouTube transcripts.
+- **Book Status**: Structure defined; 12,000+ chars drafted (Introduction).
+- **Automation**: Assistant can now track Dima's live edits on Google Drive.
+- **Git Status**: All local changes synced with `origin/main`.
