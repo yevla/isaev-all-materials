@@ -5,7 +5,7 @@ import os
 # Configuration
 PATHS = {
     'lj': 'materials/1.LJ/data/final_posts.csv',
-    'fb': 'materials/2.fb_dsisaev/processed/posts_cleaned.json',
+    'fb': 'materials/2.fb_dsisaev/fb_classified.csv',
     'yt': 'materials/3.yt/yt_classified.csv',
     'template': 'dashboard/template.html',
     'output': 'dashboard/index.html'
@@ -46,20 +46,23 @@ def collect_data():
     # 2. Facebook
     if os.path.exists(PATHS['fb']):
         try:
-            with open(PATHS['fb'], 'r', encoding='utf-8') as f:
-                posts = json.load(f)
-            for p in posts:
+            df = pd.read_csv(PATHS['fb'])
+            for _, row in df.iterrows():
+                # Fix nan/float for list columns by checking type or filling na
+                cats = clean_list(str(row.get('categories', ''))) if pd.notna(row.get('categories')) else []
+                tags = clean_list(str(row.get('tags', ''))) if pd.notna(row.get('tags')) else []
+                
                 master_data.append({
                     "source": "FB",
-                    "id": f"fb_{p.get('id', '')}",
+                    "id": f"fb_{row.get('id', '')}",
                     "title": "Facebook Post",
-                    "date": str(p.get('date', '')),
-                    "categories": p.get('categories', []),
-                    "tags": p.get('tags', []),
-                    "content": str(p.get('content', '')),
-                    "url": str(p.get('url', ''))
+                    "date": str(row.get('date', '')),
+                    "categories": cats,
+                    "tags": tags,
+                    "content": str(row.get('content', '')),
+                    "url": str(row.get('url', ''))
                 })
-            print(f"Loaded {len(posts)} FB posts")
+            print(f"Loaded {len(df)} FB posts")
         except Exception as e:
             print(f"Error loading FB: {e}")
 
