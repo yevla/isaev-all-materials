@@ -1,76 +1,46 @@
-# Project Milestones & Development History
+# Этапы Развития Проекта (Milestones)
 
-> **Objective**: Centralize Isaev's archive (LiveJournal, Facebook, YouTube) into a unified, explorable digital format.
+> **Цель**: Централизация, классификация и подготовка огромного архива Дмитрия Исаева (LiveJournal, Facebook, YouTube, Аудиолекции) к написанию единой книги.
 
-## Milestone 1: Foundation & Taxonomy
-- [x] **Analysis of LiveJournal (Primary Source)**
-    - Scanned `materials/1.LJ` (279 posts).
-    - Identified core themes: *Psychotherapy, Psychiatry, Social Psychology, Personal*.
-    - **Outcome**: Developed a unified Tagging Taxonomy (Logic vs. Emo, Professional vs. Personal) to be applied across all other sources.
+## Этап 1: Фундамент и Таксономия
+- [x] **Анализ Живого Журнала (Главный Источник)**
+    - Просканирована папка `materials/1.LJ` (279 постов).
+    - Определены ключевые темы: *Психотерапия, Психиатрия, Социальная психология, Личное*.
+    - **Результат**: Создана единая система тегов (Разделение на Логику и Эмоции, Профессиональное и Личное) для всех будущих источников.
 
-## Milestone 2: Data Processing & Normalization
+## Этап 2: Обработка Данных и Нормализация
 - [x] **Facebook (`materials/2.fb_dsisaev`)**
-    - **Problem**: Raw export was messy, containing reposts and system messages.
-    - **Action**: Wrote `process_fb_data.py`.
-    - **Logic**:
-        - Filtered out short posts (<50 chars) and obvious reposts.
-        - Applied LJ Taxonomy to classify remaining 82 posts.
-    - **Result**: structured JSON + Markdown files for high-value content.
+    - **Проблема**: "Грязный" экспорт, полный репостов и технических сообщений.
+    - **Решение**: Написан парсер `process_fb_data.py`.
+    - **Результат**: Исключено мусорное содержимое (<50 символов), оставшиеся 82 поста классифицированы по единой схеме ЖЖ.
 
 - [x] **YouTube (`materials/3.yt`)**
-    - **Action**: Analyzed video titles and descriptions.
-    - **Logic**: Classified 35 videos using the same taxonomy key.
-    - **Result**: Generated `yt_classified.csv` with standardized headers (Source, Date, Title, Tags, Link).
+    - Изучены заголовки, описания и транскрипты. Классифицировано 35 видео. Получен стандартизированный файл с тегами `yt_classified.csv`.
 
-- [x] **Repository Setup**
-    - Initialized Git repository.
-    - Configured `.gitignore` (ignoring system files, raw large assets).
-    - Established `CATALOG.md` as the single source of truth for file locations.
+- [x] **Настройка Хранилища**
+    - Инициация репозитория, игнорирование тяжелых файлов. Создание `CATALOG.md` как Главной Точки Правды для всей файловой системы.
 
-## Milestone 3: Dashboard Architecture (The "Single-File" Challenge)
-- [x] **Concept**: Create a "Master Dashboard" to browse everything without needing to look at folders.
-- [x] **Constraint**: The user must be able to run this **offline** by just double-clicking a file.
-- [x] **Technical Hurdle**:
-    - Browsers block `fetch('data.json')` for local files (CORS policy).
-    - **Solution**: "Injection Build System". `scripts/build_dashboard.py` reads all data and *injects* it directly into a JS variable inside the HTML. No external requests needed.
+## Этап 3: Создание Дашборда (Проблема одного файла)
+- [x] **Концепция**: Унифицированный дашборд для навигации по всем материалам оффлайн, без запуска сервера.
+- [x] **Преодоление CORS**: Браузеры блокируют `fetch` для локальных фалов. Решение — скрипт `scripts/build_dashboard.py`, жестко внедряющий базу данных прямо в HTML-код.
 
-## Milestone 4: Dashboard Implementation (Iterations)
-### Iteration 1: The Prototype
-- Built basic grid layout.
-- **Issue**: UI was too simple, lacked "Wow" factor.
-- **Issue**: "White Screen of Death" reported by user.
-    - *Diagnosis*: JavaScript error during initialization (conflicting variable declarations).
+## Этап 4: Развитие Дашборда
+- Создана глубокая визуальная тема (NEXUS Dark + Glassmorphism).
+- Интегрирована интерактивная карта графов на основе **D3.js** для визуализации связей постов с тегами (с физикой притяжения).
+- Исправлены критические ошибки отображения "белого экрана смерти" (исправлены конфликты переменных `var` vs `const`).
 
-### Iteration 2: "NEXUS" Design System (Current)
-- **Visual Overhaul**:
-    - Switched to **Deep Space** theme (Dark background + Neon Accents).
-    - Implemented **Glassmorphism** (Glass panels for sidebar/modals).
-    - Typography upgrade: `Outfit` (UI) + `Cormorant Garamond` (Text).
-- **Interactive Graph (Node Map)**:
-    - Added **D3.js** integration.
-    - Visualized posts (dots) connected to tags (hubs) with physics simulation.
-    - Made nodes draggable and zoomable.
+## Этап 5: Написание Книги и Интеллектуальный Поиск (NotebookLM)
+- [x] **Ингерация с Google Drive (`gdrive_tracker`)**
+    - Настроена связь с черновиками (папка `Книга_впроцессник`). Ассистент умеет читать правки соавтора и отслеживать историю изменений.
+- [x] **Адаптация Аудиолекций**
+    - Свежие лекции 2026 года (Депрессия, Агрессия, パтология Выбора) стандартизированы по датам и загружены в ИИ-блокнот.
+- [x] **Очистка Базы Данных (CSV -> Markdown)**
+    - **Проблема**: NotebookLM путался в технических столбцах CSV (id, ссылки, просмотры).
+    - **Решение**: Создан скрипт `csv_to_md.py`. Весь текст конвертирован в чистый Markdown формат (`LJ_posts.md`, `FB_posts.md`). Старые CSV удалены из облака.
+- [x] **Генеральный План Книги (Master Mapping)**
+    - На основе `docs/book_structure/book_structure.md` запущены семантические запросы в MCP NotebookLM. ИИ распределил 100+ постов и куски аудиолекций по всем главам будущей книги. Создан единый `mapping_master.md`.
 
-### Iteration 2.1: Critical Fixes
-- **Bug**: Dashboard showed nothing on load.
-- **Fix**: Removed `const` redeclaration in injected code. Changed to robust `window.ISAEV_DATA` check.
-- **Safety**: Added a Global Error Boundary. If the dashboard crashes, it now shows a red "System Error" toast instead of failing silently.
-
-## Milestone 5: Book Drafting & Intelligent Research
-- [x] **NotebookLM Synchronization**
-    - Refined and organized 35+ notebooks into a logical structure:
-        - `Isaev: YouTube` (Video transcripts base).
-        - `Isaev: all materials` (Unified posts archive).
-        - `Isaev: live lectures` (Oral recordings).
-- [x] **Google Drive Integration**
-    - Established connection to `Книга_впроцессник` (Book-in-progress).
-    - Map of book structure (5 parts: Foundation, Scenarios, Roles, Psychosomatics, Healing).
-- [x] **Progress Tracking (New Skill)**
-    - Created `gdrive_tracker` skill to monitor Dmitry's edits, revision history, and word counts.
-    - Automated the "Snapshot" process to catch every new paragraph.
-
-## Current State (Active Implementation)
-- **Total Materials**: 396 items + 36 full YouTube transcripts.
-- **Book Status**: Structure defined; 12,000+ chars drafted (Introduction).
-- **Automation**: Assistant can now track Dima's live edits on Google Drive.
-- **Git Status**: All local changes synced with `origin/main`.
+## Текущее Состояние Проекта (Генерация Текстов)
+- **База**: 3 блокнота NotebookLM (`YouTube`, `Live Lectures`, `FB and LJ`).
+- **Архитектура**: Полностью сформирована оглавлением книги (5 Частей).
+- **Следующий шаг**: Начать генерацию **Главы 1. Вина и Обида** на основе нового Master Mapping.

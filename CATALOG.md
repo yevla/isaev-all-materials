@@ -1,13 +1,13 @@
 # Materials Catalog
 
 ## Raw Materials (READ-ONLY)
-| Category | Source Folder | Status | Description |
+| Category | Source Folder | Status | NotebookLM / Local Access |
 | :--- | :--- | :--- | :--- |
-| LiveJournal | `materials/1.LJ` | Indexed | 279 постов (2005-2023). Темы: профессиональная психология, медицина, путешествия, социальная психология. |
-| Facebook | `materials/2.fb_dsisaev` | Processed | Классифицировано 82 поста. Данные в `fb_classified.csv` (формат как у ЖЖ). |
-| YouTube | `materials/3.yt` | Processed | Классифицировано 35 видео по таксономии ЖЖ. Создан `yt_classified.csv` с английскими заголовками. |
-| Audio | `materials/4.audiolecs` | Pending | Аудиолекции (требуют детального разбора). |
-| Other | `materials/5.other` | Pending | Прочее (требует детального разбора). |
+| LiveJournal | `materials/1.LJ` | Processed | **NotebookLM**: `932e0d71...` (Isaev: FB and LJ). Sourced from `LJ_posts.md` |
+| Facebook | `materials/2.fb_dsisaev` | Processed | **NotebookLM**: `932e0d71...` (Isaev: FB and LJ). Sourced from `FB_posts.md` |
+| YouTube | `materials/3.yt` | Processed | **NotebookLM**: `d043eadc...` (Isaev: YouTube). Contains Full Transcripts. |
+| Audio | `materials/4.audiolecs` | NLM-Stored | **NotebookLM**: `05bcc6a9...` (Isaev: live lectures). Transcripts of private groups. |
+| Other | `materials/5.other` | Pending | TBD. |
 
 ## Centralized Archive
 | Component | Path | Description |

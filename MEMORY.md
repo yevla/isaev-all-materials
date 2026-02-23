@@ -1,35 +1,31 @@
-# Project Memory: Materials Centralization
+# Память Проекта: Централизация и Подготовка Книги
 
-## Project Objective
-- Collect and centralize materials for a common repository.
-- Maintain a structured catalog/archive.
-- Prepare materials for future derivative projects.
+## Цель Проекта
+- Сбор, очистка и централизация огромного массива материалов (ЖЖ, Фейсбук, YouTube, Аудиолекции).
+- Создание структурированного генерального плана (мэппинга) для написания книги.
+- Настройка ИИ-инструментов (NotebookLM) как главного поискового и смыслового ядра.
 
-## Core Rules
-- `materials/` directory is STICTLY READ-ONLY.
-- All modifications/reorganizations happen in the root or a new `centralized/` directory.
+## Основные Правила
+- Папка `materials/` имеет статус СТРОГО READ-ONLY для исходников.
+- **NotebookLM — это главный поисковый движок (RAG-сервер)** для всех текстов. Локальные файлы служат резервной копией и сырьем.
+- Структура книги жестко задана в `docs/book_structure/book_structure.md`.
+- Все ссылки на источники для написания книги сведены в единый файл `docs/mapping/mapping_master.md`.
 
-## Current Progress
-- [x] Established project rules in `.agent/rules/materials-policy.md`.
-- [x] Created initial `CATALOG.md`.
-- [x] Классификация Facebook: 82 поста обработаны.
-- [x] Классификация YouTube: 35 видео обработаны.
-- [x] **Dashboard Implementation**: Unified UI created (`dashboard/index.html`).
-  - Architecture: **Single-File HTML** (JSON injected at build time) to avoid local CORS issues.
-  - Visualization: **D3.js Force Graph** for tag connections.
-  - UI: Glassmorphism / "NEXUS" Dark Theme.
-- [x] **External Integrations**:
-  - **NotebookLM**: Connected via MCP. Cleaned up and renamed notebooks (YouTube, All Materials, Live Lectures).
-  - **Google Drive**: Implemented `gdrive_tracker` skill. Authenticated and monitoring `Книга_впроцессник` folder.
+## Текущий Прогресс (Обновлено)
+- [x] **Очистка данных (LiveJournal и Facebook)**: Исходные CSV-файлы сконвертированы в чистый Markdown (`LJ_posts.md`, `FB_posts.md`) без лишнего технического мусора (ID, URL, счетчики). Это кардинально улучшило качество выдачи ИИ.
+- [x] **Аудиолекции**: Расшифровки живых групп 2026 года (Депрессия, Патология Выбора, Агрессия) переименованы по единому стандарту и загружены в систему.
+- [x] **Архитектура NotebookLM**: Настроено ровно 3 рабочих блокнота для ИИ-поиска:
+  1. `Isaev: YouTube` (Транскрипты всех видео).
+  2. `Isaev: FB and LJ` (Очищенные текстовые посты).
+  3. `Isaev: live lectures` (Транскрипты свежих аудиолекций).
+- [x] **Генеральный План (Master Mapping)**: ИИ NotebookLM проанализировал всю базу данных и автоматически привязал сотни постов и фрагменты лекций к конкретным главам структуры книги. Результат сохранен в `mapping_master.md`.
+- [x] **Ингерация с Google Drive**: Настроен и работает навык `gdrive_tracker`, который позволяет отслеживать правки соавтора (Дмитрия Исаева) в документе "Введение".
+- [x] **Dashboard Implementation**: Создан локальный UI-дашборд (`dashboard/index.html`) с D3.js графами для визуализации всех материалов.
 
-## Architectural Notes
-- **Local Filesystem Constraints**: Browsers block `fetch('data.json')` for `file://` protocol due to CORS. 
-  - *Solution*: Data is injected into `<script>` inside `index.html` by `scripts/build_dashboard.py`.
-- **Variable Declaration**: Avoid `const` for data injection variables if the script might be re-evaluated or if injection fails. Use `var` or `window.DATA` checking.
-- **MCP Integration**: Uses both `notebooklm` (for transcripts/analysis) and `google-drive-mcp` (for tracking drafting progress).
-- [ ] Process `4.audiolecs` and `5.other`.
-- [ ] Map all 36 YouTube transcripts to the Book Structure identified in Google Drive.
+## Архитектурные Заметки
+- **MCP Интеграция**: Скрипты переписаны так, чтобы Ассистент обращался к `notebooklm_researcher` для ЛЮБОГО поиска смыслов. Прямой поиск по локальным файлам оставлен только для системных нужд.
+- **Авторизация**: Для починки падающих токенов NotebookLM используется локальный скрипт автоматической авторизации `notebook_manager.js trigger-auth`.
 
-## Context & Constraints
-- Working with diverse material types (text, social media, audio).
-- Target: Clean, searchable, and structured archive for future projects.
+## Планы на будущее
+- [ ] Дождаться правок Дмитрия во "Введении" (`intro_v2`) и финализировать текст.
+- [ ] Начать генерацию черновика **Главы 1 (Вина и Обида)**, опираясь на утвержденный `mapping_master.md` и запросы к трем базам NotebookLM.
